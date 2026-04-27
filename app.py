@@ -1,17 +1,18 @@
+import subprocess, os
+
+# 为 Linux 云服务器安装中文字体
+try:
+    subprocess.run(['apt-get', 'update'], capture_output=True, timeout=60)
+    subprocess.run(['apt-get', 'install', '-y', 'fonts-wqy-zenhei'], capture_output=True, timeout=60)
+    os.system('fc-cache -fv 2>/dev/null')
+except:
+    pass
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import matplotlib.font_manager as fm
-
-# 检测系统可用中文字体
-系统字体 = [f.name for f in fm.fontManager.ttflist]
-备选中文字体 = [f for f in ['WenQuanYi Zen Hei', 'Noto Sans CJK SC', 'SimHei', 'Microsoft YaHei'] if f in 系统字体]
-
-if 备选中文字体:
-    plt.rcParams['font.sans-serif'] = 备选中文字体 + ['DejaVu Sans']
-else:
-    plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
+plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
 st.set_page_config(page_title="通用数据分析看板", layout="wide")
@@ -26,38 +27,28 @@ if 上传文件 is not None:
     st.subheader("📋 数据预览")
     st.dataframe(df)
 
-    # === 第一步：让用户选分类列（横轴） ===
     所有列 = df.columns.tolist()
     分类列 = st.selectbox("选择用作分类的列（横轴）", 所有列)
 
-    # === 第二步：数值列选择模式 ===
     模式 = st.radio("分析模式", ["统计分类出现次数（计数）", "按数值列求和/平均值"])
 
     if 模式 == "统计分类出现次数（计数）":
-        # 直接统计每个分类出现了几次
         统计结果 = df[分类列].value_counts()
         图表标题 = f"{分类列} 出现次数统计"
-
     else:
-        # 需要用户再选一个数值列
         数值列 = st.selectbox("选择用作数值的列（纵轴）", 所有列)
         聚合方式 = st.selectbox("聚合方式", ["求和", "平均值"])
-
         if 聚合方式 == "求和":
             统计结果 = df.groupby(分类列)[数值列].sum()
         else:
             统计结果 = df.groupby(分类列)[数值列].mean()
-
         图表标题 = f"各{分类列} 的{数值列}（{聚合方式}）"
 
-    # === 显示统计表 ===
     st.subheader("📊 统计结果")
     st.dataframe(统计结果)
 
-    # === 第三步：用户选图表类型 ===
     图表类型 = st.selectbox("选择图表类型", ["柱状图", "横向柱状图", "饼图", "折线图"])
 
-    # === 第四步：画图 ===
     st.subheader("📈 图表")
     fig, ax = plt.subplots()
 
