@@ -1,13 +1,3 @@
-import subprocess, os
-
-# 为 Linux 云服务器安装中文字体
-try:
-    subprocess.run(['apt-get', 'update'], capture_output=True, timeout=60)
-    subprocess.run(['apt-get', 'install', '-y', 'fonts-wqy-zenhei'], capture_output=True, timeout=60)
-    os.system('fc-cache -fv 2>/dev/null')
-except:
-    pass
-
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
