@@ -2,7 +2,16 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
+import matplotlib.font_manager as fm
+
+# 检测系统可用中文字体
+系统字体 = [f.name for f in fm.fontManager.ttflist]
+备选中文字体 = [f for f in ['WenQuanYi Zen Hei', 'Noto Sans CJK SC', 'SimHei', 'Microsoft YaHei'] if f in 系统字体]
+
+if 备选中文字体:
+    plt.rcParams['font.sans-serif'] = 备选中文字体 + ['DejaVu Sans']
+else:
+    plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
 st.set_page_config(page_title="通用数据分析看板", layout="wide")
